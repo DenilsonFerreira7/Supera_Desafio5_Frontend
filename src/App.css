@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  background-color: rgb(88, 85, 84);
+}
+.container_limit{
+display: flex;
+flex-direction: column;
+min-width: 880px;
+background-color: hsl(0, 0%, 98%);
+padding: 0 1%;
+border-radius: 18px;
+box-shadow: 20px 30px 5px rgba(0, 0, 0, 0.2);
+}
+.container_input{
+  display: flex;
+  justify-content: space-between;
+  padding: 10% 0;
+  flex-direction: row;
+}
+.get_saldo{
+  display: flex;
+}
