@@ -66,6 +66,18 @@ export const buscarTransferenciasPorConta = (accountId,setTransferencias) => {
       });
   };
 
+  // Calcular saldo total por período e conta de um operador
+  export const calcularSaldoTotalPorPeriodoEContaEOperador = (operatorName,setSaldoTotal) => {
+    axios
+      .get(`http://localhost:8080/saldo/totalPeriodoEContaOperador/${operatorName}`)
+      .then(response => {
+        const saldoTotal = response.data;
+        setSaldoTotal(saldoTotal);
+      })
+      .catch(error => {
+        console.error('Erro ao calcular saldo total por período e conta de um operador:', error);
+      });
+  };
 
   // Função para buscar o saldo total por período e conta ID
  export const buscarSaldoTotalPorPeriodoEConta = async (accountId, formattedStartDate, formattedEndDate,setSaldoPeriodo) => {
@@ -96,44 +108,3 @@ export const buscarTransferenciasPorConta = (accountId,setTransferencias) => {
       console.error('Erro ao buscar transferências por conta e período:', error);
     }
   };
-
-
-// Calcular saldo total por período e conta de um operador
-export const calcularSaldoTotalPorPeriodoEOperador = async (formattedStartDate, formattedEndDate, nomeOperador, setSaldoTotal) => {
-  try {
-    const response = await axios.get(
-      `http://localhost:8080/saldo/totalPeriodoEOperador?inicio=${formattedStartDate}&fim=${formattedEndDate}&nomeOperador=${nomeOperador}`
-    );
-    const saldoTotal = response.data;
-    setSaldoTotal(saldoTotal);
-  } catch (error) {
-    console.error('Erro ao calcular saldo total por período e operador:', error);
-  }
-};
-
-// Buscar transferências por período e operador
-export const buscarTransferenciasPorPeriodoEOperador = async (formattedStartDate, formattedEndDate, nomeOperador, setTransferencias) => {
-  try {
-    const response = await axios.get(
-      `http://localhost:8080/transferencia/periodo-operador?inicio=${formattedStartDate}&fim=${formattedEndDate}&nomeOperador=${nomeOperador}`
-    );
-    const transferencias = response.data;
-    setTransferencias(transferencias);
-  } catch (error) {
-    console.error('Erro ao buscar transferências por período e operador:', error);
-  }
-};
-
-
-// Calcular saldo total por nome do operador
-export const calcularSaldoTotalPorNomeOperador = async (nomeOperador, setSaldoTotal) => {
-  try {
-    const response = await axios.get(
-      `http://localhost:8080/saldo/totalNomeOperador/${nomeOperador}`
-    );
-    const saldoTotal = response.data;
-    setSaldoTotal(saldoTotal);
-  } catch (error) {
-    console.error('Erro ao calcular saldo total por nome do operador:', error);
-  }
-};
