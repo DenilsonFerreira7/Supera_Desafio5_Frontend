@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import { Button, CssBaseline, TextField, Typography } from '@mui/material';
-import "../src/App.css";
+import '../src/App.css';
 import DataTable from './components/table';
 import { format } from 'date-fns';
-import { buscarSaldoTotalPorPeriodoEConta, buscarTransferenciasPorConta,
-       buscarTransferenciasPorContaEPeriodo,
-       buscarTransferenciasPorOperador, buscarTransferenciasPorPeriodo, calcularSaldoTotalPorConta,
-       calcularSaldoTotalPorPeriodo, calcularSaldoTotalPorPeriodoEContaEOperador } from './api';
+import {
+  buscarSaldoTotalPorPeriodoEConta,
+  buscarTransferenciasPorConta,
+  buscarTransferenciasPorContaEPeriodo,
+  buscarTransferenciasPorOperador,
+  buscarTransferenciasPorPeriodo,
+  calcularSaldoTotalPorConta,
+  calcularSaldoTotalPorPeriodo,
+  calcularSaldoTotalPorPeriodoEOperador,
+  buscarTransferenciasPorPeriodoEOperador,
+  calcularSaldoTotalPorNomeOperador,
+} from './api';
 
 function App() {
   const [startDate, setStartDate] = useState('');
@@ -23,22 +31,33 @@ function App() {
   };
 
   const handleSearch = async () => {
-    if (accountId && startDate) {
-      await buscarTransferenciasPorContaEPeriodo(accountId, startDate, endDate,setTransferencias);
-      await buscarSaldoTotalPorPeriodoEConta(accountId, startDate, endDate,setSaldoPeriodo);
-    } else if (operatorName) {
-      buscarTransferenciasPorOperador(operatorName,setTransferencias);
-      calcularSaldoTotalPorPeriodoEContaEOperador(operatorName,setSaldoTotal);
-    } else if (accountId) {
-      buscarTransferenciasPorConta(accountId,setTransferencias);
-      calcularSaldoTotalPorConta(accountId,setSaldoTotal);
-    } else if (startDate && endDate) {
-      buscarTransferenciasPorPeriodo(startDate, endDate,setTransferencias);
-      calcularSaldoTotalPorPeriodo(startDate, endDate,setSaldoPeriodo);
-    } else {
-      return;
+    try {
+      if (accountId && startDate) {
+        await buscarTransferenciasPorContaEPeriodo(accountId, startDate, endDate, setTransferencias);
+        await buscarSaldoTotalPorPeriodoEConta(accountId, startDate, endDate, setSaldoPeriodo);
+        setSaldoTotal('');
+      } else if (operatorName && startDate && endDate) {
+        await buscarTransferenciasPorPeriodoEOperador(startDate, endDate, operatorName, setTransferencias);
+        await calcularSaldoTotalPorPeriodoEOperador(startDate, endDate, operatorName, setSaldoPeriodo);
+        setSaldoTotal('');
+      } else if (accountId) {
+        await buscarTransferenciasPorConta(accountId, setTransferencias);
+        await calcularSaldoTotalPorConta(accountId, setSaldoTotal);
+        setSaldoPeriodo('');
+      } else if (startDate && endDate) {
+        await buscarTransferenciasPorPeriodo(startDate, endDate, setTransferencias);
+        await calcularSaldoTotalPorPeriodo(startDate, endDate, setSaldoPeriodo);
+        setSaldoTotal('');
+      } else if (operatorName) {
+        await buscarTransferenciasPorOperador(operatorName, setTransferencias);
+        await calcularSaldoTotalPorNomeOperador(operatorName, setSaldoTotal);
+        setSaldoPeriodo('');
+      }
+    } catch (error) {
+      console.error('Erro ao realizar a pesquisa:', error);
     }
   };
+
   return (
     <div className='container'>
       <CssBaseline />
@@ -85,10 +104,11 @@ function App() {
           Pesquisar
         </Button>
         <div className='get_saldo'>
-          {startDate && endDate ? null : (
+          {startDate && endDate ? (
+            <Typography sx={{ marginRight: '10%' }}>Saldo no período: {saldoPeriodo}</Typography>
+          ) : (
             <Typography sx={{ marginRight: '10%' }}>Saldo total: {saldoTotal}</Typography>
           )}
-          <Typography>Saldo no período: {saldoPeriodo}</Typography>
         </div>
         <DataTable transferencias={transferencias} />
       </div>
